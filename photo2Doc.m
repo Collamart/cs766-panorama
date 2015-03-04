@@ -73,24 +73,7 @@ newDimension = max([newWidth newHeight]);
 cp1 = [upperLeft; upperRight; lowerRight; lowerLeft];
 cp2 = [1, 1; 1, newWidth; newHeight, newWidth; newHeight, 1];
 
-A = zeros(8, 8);
-b = zeros(8, 1);
-for i = 1:size(cp1,1)
-    A(2*i-1,1) = cp2(i,1);
-    A(2*i-1,2) = cp2(i,2);
-    A(2*i-1,3) = 1;
-    A(2*i-1,7) = -cp1(i,1)*cp2(i,1);
-    A(2*i-1,8) = -cp1(i,1)*cp2(i,2);
-    b(2*i-1) = cp1(i,1);
-    A(2*i,4) = cp2(i,1);
-    A(2*i,5) = cp2(i,2);
-    A(2*i,6) = 1;
-    A(2*i,7) = -cp1(i,2)*cp2(i,1);
-    A(2*i,8) = -cp1(i,2)*cp2(i,2);
-    b(2*i) = cp1(i,2);
-end
-h = A \ b;
-H = [h(1) h(2) h(3); h(4) h(5) h(6); h(7) h(8) 1];
+H = compHomography(cp1, cp2);
 
 newImgRaw = zeros([newHeight newWidth channel], 'uint8');
 for y = 1 : newHeight

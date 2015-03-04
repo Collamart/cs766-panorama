@@ -5,9 +5,10 @@
 %               to points in image1, 3 x 3 matrix
 function [ H ] = compHomography( cp1, cp2 )
 
-A = zeros(8, 8);
-b = zeros(8, 1);
-for i = 1:size(cp1,1)
+n = size(cp1,1);
+A = zeros(2*n, 8);
+b = zeros(2*n, 1);
+for i = 1:n
     A(2*i-1,1) = cp2(i,1);
     A(2*i-1,2) = cp2(i,2);
     A(2*i-1,3) = 1;
