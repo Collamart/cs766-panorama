@@ -34,13 +34,22 @@ H = [h(1) h(2) h(3); h(4) h(5) h(6); h(7) h(8) 1];
 img = [img1 zeros(size(img1))];
 h = size(img1, 1);
 w = size(img1, 2);
+ct = 1;
 for y = 1 : h
     for x = w+1 : 2*w
         p1 = [y; x; 1];
         p2 = H \ p1;
         p2 = p2 ./ p2(3);
         if p2(1) >= 1 && p2(1) <= h && p2(2) >= 1 && p2(2) <= w
-            img(y,x,:) = img2(round(p2(1)),round(p2(2)),:);
+            %img(y, x, :) = img2(round(p2(1)), round(p2(2)), :);
+            i = floor(p2(2));
+            a = p2(2) - i;
+            j = floor(p2(1));
+            b = p2(1) - j;
+            img(y, x, :) = (1 - a) * (1 - b) * img2(j, i, :)...
+                + a * (1 - b) * img2(j, i + 1, :)...
+                + a * b * img2(j + 1, i + 1, :)...
+                + (1 - a) * b * img2(j + 1, i, :);
         end
     end
 end

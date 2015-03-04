@@ -1,5 +1,5 @@
 %% image information
-img = imread('TestImages/TestEx1-1.jpg');
+img = imread('TestImages/TestEx1-3.jpg');
 width = size(img, 2);
 height = size(img, 1);
 channel = size(img, 3);
@@ -99,7 +99,15 @@ for y = 1 : newHeight
         p2 = H * p1;
         p2 = p2 ./ p2(3);
         if p2(1) >= 1 && p2(1) <= height && p2(2) >= 1 && p2(2) <= width
-            newImgRaw(y, x, :) = img(round(p2(1)), round(p2(2)), :);
+            %newImgRaw(y, x, :) = img(round(p2(1)), round(p2(2)), :);
+            i = floor(p2(2));
+            a = p2(2) - i;
+            j = floor(p2(1));
+            b = p2(1) - j;
+            newImgRaw(y, x, :) = (1 - a) * (1 - b) * img(j, i, :)...
+                + a * (1 - b) * img(j, i + 1, :)...
+                + a * b * img(j + 1, i + 1, :)...
+                + (1 - a) * b * img(j + 1, i, :);
         end
     end
 end
