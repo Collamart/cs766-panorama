@@ -1,9 +1,7 @@
 %% Get features pairs using SIFT features
 % Uses VLFeat to obtain SIFT feature pairs
 
-%% NOT FINISHED!
-% 1) Add edge and peak threshold params
-% 2) return descriptors and features
+%% DEPRECIATED -> Use getSIFTFeatures & getPotentialMatches
 function [potential_matches] = obtainFeaturePairs(image1, image2)
 
 % setup VLFeat
