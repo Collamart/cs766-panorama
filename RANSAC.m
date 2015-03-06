@@ -19,7 +19,7 @@ bestSet = [];
 for i = 1:k
     set = 1:numPoints; % create set of all possible points
     sampleIndicies = randperm(numPoints, n);
-    set(sampleIndicies) = []; % remove samples from set
+    %set(sampleIndicies) = []; % remove samples from set
     
     samples = data(sampleIndicies,:,:);
     setting = settingFunctionHandle(samples(:,:,1), samples(:,:,2)); % get current settings
