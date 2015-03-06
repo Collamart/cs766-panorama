@@ -3,6 +3,7 @@
 %           cp2 - correspondence points in image2, n x 2 matrix
 %  output:  H - homography matrix that transforms points in image2
 %               to points in image1, 3 x 3 matrix
+%  if overdetermined, solve in the least-sqaure sense
 function [ H ] = compHomography( cp1, cp2 )
 
 n = size(cp1,1);
