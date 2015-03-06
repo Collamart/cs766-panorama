@@ -1,6 +1,8 @@
 %% Get features pairs using SIFT features
 % Uses VLFeat to obtain SIFT feature pairs
 
+%% DEPRECIATED!!!!!!!!
+
 %% DEPRECIATED -> Use getSIFTFeatures & getPotentialMatches
 function [potential_matches] = obtainFeaturePairs(image1, image2)
 
@@ -56,8 +58,9 @@ for mat = 1:numMatches
     f1_index = matches(1,mat);
     f2_index = matches(2,mat);
     
-    pairs(mat,:,1) = f1(1:2,f1_index)';
-    pairs(mat,:,2) = f2(1:2,f2_index)';
+    % x y z=1
+    pairs(mat,:,1) = [f1(2,f1_index) f1(1,f1_index) 1]; % img1
+    pairs(mat,:,2) = [f2(2,f2_index) f2(1,f2_index) 1]; % img2
 end
 
 potential_matches = pairs;

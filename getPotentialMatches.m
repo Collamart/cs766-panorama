@@ -13,7 +13,7 @@ for mat = 1:numMatches
     f1_index = matches(1,mat);
     f2_index = matches(2,mat);
     
-    % x y z=0
+    % x y z=1
     pairs(mat,:,1) = [f1(2,f1_index) f1(1,f1_index) 1]; % img1
     pairs(mat,:,2) = [f2(2,f2_index) f2(1,f2_index) 1]; % img2
 end
