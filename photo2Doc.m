@@ -81,7 +81,7 @@ for y = 1 : newHeight
         p1 = [y; x; 1];
         p2 = H * p1;
         p2 = p2 ./ p2(3);
-        if p2(1) >= 1 && p2(1) <= height && p2(2) >= 1 && p2(2) <= width
+        if p2(1) >= 1 && p2(1) < height && p2(2) >= 1 && p2(2) < width
             %newImgRaw(y, x, :) = img(round(p2(1)), round(p2(2)), :);
             i = floor(p2(2));
             a = p2(2) - i;

@@ -24,7 +24,7 @@ for y = 1 : h
         p1 = [y; x; 1];
         p2 = homography \ p1;
         p2 = p2 ./ p2(3);
-        if p2(1) >= 1 && p2(1) <= h && p2(2) >= 1 && p2(2) <= w
+        if p2(1) >= 1 && p2(1) < h && p2(2) >= 1 && p2(2) < w
             %img(y, x, :) = img2(round(p2(1)), round(p2(2)), :);
             i = floor(p2(2));
             a = p2(2) - i;
