@@ -1,4 +1,12 @@
-imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg',...
+    'TestImages/Test2-3.jpg', 'TestImages/Test2-4.jpg',...
+    'TestImages/Test2-5.jpg', 'TestImages/Test2-6.jpg',...
+    'TestImages/Test2-7.jpg', 'TestImages/Test2-8.jpg',...
+    'TestImages/Test2-9.jpg', 'TestImages/Test2-10.jpg',...
+    'TestImages/Test2-11.jpg', 'TestImages/Test2-12.jpg',...
+    'TestImages/Test2-13.jpg', 'TestImages/Test2-14.jpg',...
+    'TestImages/Test2-15.jpg', 'TestImages/Test2-16.jpg',...
+    'TestImages/Test2-17.jpg', 'TestImages/Test2-18.jpg'};
 % imgFiles = fliplr(imgFiles); % for debugging
 imgs = loadImages(imgFiles);
 height = size(imgs, 1);
@@ -10,16 +18,17 @@ nImgs = size(imgs, 4);
 f = 595;
 k1 = 0.15;
 k2 = 0;
-cylImgs = zeros(size(imgs), 'uint8');
+cylImgs = zeros([height width nChannels nImgs + 1], 'uint8');
 for i = 1 : nImgs
     cylImgs(:, :, :, i) = cylProj(imgs(:, :, :, i), f, k1, k2);
 end
+cylImgs(:, :, :, end) = cylImgs(:, :, :, 1);
 
 %% pairwise alignment
-translations = zeros(3, 3, nImgs);
+translations = zeros(3, 3, nImgs + 1);
 translations(:, :, 1) = eye(3);
 [f2, d2] = getSIFTFeatures(cylImgs(:, :, :, 1), 10);
-for i = 2 : nImgs
+for i = 2 : nImgs + 1
     f1 = f2;
     d1 = d2;
     [f2, d2] = getSIFTFeatures(cylImgs(:, :, :, i), 10);
@@ -28,33 +37,17 @@ for i = 2 : nImgs
         RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
 end
 
-%% size computation
-maxX = width;
-minX = 1;
-maxY = height;
-minY = 1;
-frame = [[1; 1; 1], [height; 1; 1], [1; width; 1], [height; width; 1]];
-for i = 2 : nImgs 
-    newFrame = translations(:, :, i) * frame;
-    newFrame(:, 1) = newFrame(:, 1) ./ newFrame(3, 1);
-    newFrame(:, 2) = newFrame(:, 2) ./ newFrame(3, 2);
-    newFrame(:, 3) = newFrame(:, 3) ./ newFrame(3, 3);
-    newFrame(:, 4) = newFrame(:, 4) ./ newFrame(3, 4);
-    maxX = max(maxX, max(newFrame(2, :)));
-    minX = min(minX, min(newFrame(2, :)));
-    maxY = max(maxY, max(newFrame(1, :)));
-    minY = min(minY, min(newFrame(1, :)));
+%% drift estimation
+driftSlope = translations(1, 3, end) / translations(2, 3, end);
+newWidth = abs(round(translations(2, 3, end))) + width;
+if translations(2, 3, end) < 0
+    translations(2, 3, :) = translations(2, 3, :) - translations(2, 3, end);
+    translations(1, 3, :) = translations(1, 3, :) - translations(1, 3, end);
 end
-newWidth = ceil(maxX) - floor(minX) + 1;
-newHeight = ceil(maxY) - floor(minY) + 1;
-offsetX = 1 - floor(minX);
-offsetY = 1 - floor(minY);
-translations(2, 3, :) = translations(2, 3, :) + offsetX;
-translations(1, 3, :) = translations(1, 3, :) + offsetY;
 
 %% backward transformation
 backTranslations = zeros(size(translations));
-for i = 1 : nImgs
+for i = 1 : nImgs + 1
     backTranslations(:, :, i) = inv(translations(:, :, i));
 end
 
@@ -66,15 +59,14 @@ alphaMask = bwdist(alphaMask, 'euclidean');
 alphaMask = alphaMask ./ max(max(alphaMask));
 
 %% image merging
-newImg = zeros(newHeight, newWidth, nChannels, 'uint8');
-for y = 1 : newHeight
+newImg = zeros(height, newWidth, nChannels, 'uint8');
+for y = 1 : height
     for x = 1 : newWidth
-        p1 = [y; x; 1];
+        p1 = [(y + driftSlope * (x - 1)); x; 1];
         pixelSum = zeros(nChannels, 1);
         alphaSum = 0;
-        for k = 1 : nImgs
+        for k = 1 : nImgs + 1
             p2 = backTranslations(:, :, k) * p1;
-            % p2 = p2 ./ p2(3);
             if p2(1) >= 1 && p2(1) < height && p2(2) >= 1 && p2(2) < width
                 i = floor(p2(2));
                 a = p2(2) - i;
@@ -96,4 +88,7 @@ for y = 1 : newHeight
     end
 end
 
-imshow(newImg);
+%% image cropping
+croppedImg = newImg(:, width / 2 : newWidth - width / 2, :);
+
+imshow(croppedImg);
