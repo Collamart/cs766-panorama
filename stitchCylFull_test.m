@@ -36,6 +36,11 @@ for i = 2 : nImgs + 1
     translations(:, :, i) = RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
 end
 
+%% exposure matching
+for i = 2 : nImgs + 1
+    [cylImgs(:, :, :, i), fit] = matchExposures(cylImgs(:, :, :, i - 1), cylImgs(:, :, :, i), translations(:, :, i));
+end
+
 %% transformation accumulation
 accTranslations = zeros(size(translations));
 accTranslations(:, :, 1) = translations(:, :, 1);
@@ -97,4 +102,5 @@ end
 %% image cropping
 croppedImg = newImg(:, width / 2 : newWidth - width / 2, :);
 
+figure;
 imshow(croppedImg);

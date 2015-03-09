@@ -1,4 +1,4 @@
-imgFiles = {'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
 % imgFiles = fliplr(imgFiles); % for debugging
 imgs = loadImages(imgFiles);
 height = size(imgs, 1);
@@ -25,6 +25,11 @@ for i = 2 : nImgs
     [f2, d2] = getSIFTFeatures(cylImgs(:, :, :, i), 10);
     [matches, ~] = getPotentialMatches(f1, d1, f2, d2);
     translations(:, :, i) = RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
+end
+
+%% exposure matching
+for i = 2 : nImgs
+    cylImgs(:, :, :, i) = matchExposures(cylImgs(:, :, :, i - 1), cylImgs(:, :, :, i), translations(:, :, i));
 end
 
 %% transformation accumulation
@@ -102,4 +107,5 @@ for y = 1 : newHeight
     end
 end
 
+figure;
 imshow(newImg);
