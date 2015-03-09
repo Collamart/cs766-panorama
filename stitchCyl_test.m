@@ -1,4 +1,4 @@
-imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgFiles = {'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
 % imgFiles = fliplr(imgFiles); % for debugging
 imgs = loadImages(imgFiles);
 height = size(imgs, 1);
@@ -8,7 +8,7 @@ nImgs = size(imgs, 4);
 
 %% cylindrical projection
 f = 595;
-k1 = 0.15;
+k1 = -0.15;
 k2 = 0;
 cylImgs = zeros(size(imgs), 'uint8');
 for i = 1 : nImgs
@@ -24,8 +24,14 @@ for i = 2 : nImgs
     d1 = d2;
     [f2, d2] = getSIFTFeatures(cylImgs(:, :, :, i), 10);
     [matches, ~] = getPotentialMatches(f1, d1, f2, d2);
-    translations(:, :, i) = translations(:, :, i - 1) *...
-        RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
+    translations(:, :, i) = RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
+end
+
+%% transformation accumulation
+accTranslations = zeros(size(translations));
+accTranslations(:, :, 1) = translations(:, :, 1);
+for i = 2 : nImgs
+    accTranslations(:, :, i) = accTranslations(:, :, i - 1) * translations(:, :, i);
 end
 
 %% size computation
@@ -35,7 +41,7 @@ maxY = height;
 minY = 1;
 frame = [[1; 1; 1], [height; 1; 1], [1; width; 1], [height; width; 1]];
 for i = 2 : nImgs 
-    newFrame = translations(:, :, i) * frame;
+    newFrame = accTranslations(:, :, i) * frame;
     newFrame(:, 1) = newFrame(:, 1) ./ newFrame(3, 1);
     newFrame(:, 2) = newFrame(:, 2) ./ newFrame(3, 2);
     newFrame(:, 3) = newFrame(:, 3) ./ newFrame(3, 3);
@@ -49,13 +55,13 @@ newWidth = ceil(maxX) - floor(minX) + 1;
 newHeight = ceil(maxY) - floor(minY) + 1;
 offsetX = 1 - floor(minX);
 offsetY = 1 - floor(minY);
-translations(2, 3, :) = translations(2, 3, :) + offsetX;
-translations(1, 3, :) = translations(1, 3, :) + offsetY;
+accTranslations(2, 3, :) = accTranslations(2, 3, :) + offsetX;
+accTranslations(1, 3, :) = accTranslations(1, 3, :) + offsetY;
 
 %% backward transformation
-backTranslations = zeros(size(translations));
+backTranslations = zeros(size(accTranslations));
 for i = 1 : nImgs
-    backTranslations(:, :, i) = inv(translations(:, :, i));
+    backTranslations(:, :, i) = inv(accTranslations(:, :, i));
 end
 
 %% alpha mask

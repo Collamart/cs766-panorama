@@ -16,7 +16,7 @@ nImgs = size(imgs, 4);
 
 %% cylindrical projection
 f = 595;
-k1 = 0.15;
+k1 = -0.15;
 k2 = 0;
 cylImgs = zeros([height width nChannels nImgs + 1], 'uint8');
 for i = 1 : nImgs
@@ -33,22 +33,28 @@ for i = 2 : nImgs + 1
     d1 = d2;
     [f2, d2] = getSIFTFeatures(cylImgs(:, :, :, i), 10);
     [matches, ~] = getPotentialMatches(f1, d1, f2, d2);
-    translations(:, :, i) = translations(:, :, i - 1) *...
-        RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
+    translations(:, :, i) = RANSAC(0.99, 0.5, 1, matches, 3, @compTranslation, @SSDTranslation);
+end
+
+%% transformation accumulation
+accTranslations = zeros(size(translations));
+accTranslations(:, :, 1) = translations(:, :, 1);
+for i = 2 : nImgs + 1
+    accTranslations(:, :, i) = accTranslations(:, :, i - 1) * translations(:, :, i);
 end
 
 %% drift estimation
-driftSlope = translations(1, 3, end) / translations(2, 3, end);
-newWidth = abs(round(translations(2, 3, end))) + width;
-if translations(2, 3, end) < 0
-    translations(2, 3, :) = translations(2, 3, :) - translations(2, 3, end);
-    translations(1, 3, :) = translations(1, 3, :) - translations(1, 3, end);
+driftSlope = accTranslations(1, 3, end) / accTranslations(2, 3, end);
+newWidth = abs(round(accTranslations(2, 3, end))) + width;
+if accTranslations(2, 3, end) < 0
+    accTranslations(2, 3, :) = accTranslations(2, 3, :) - accTranslations(2, 3, end);
+    accTranslations(1, 3, :) = accTranslations(1, 3, :) - accTranslations(1, 3, end);
 end
 
 %% backward transformation
-backTranslations = zeros(size(translations));
+backTranslations = zeros(size(accTranslations));
 for i = 1 : nImgs + 1
-    backTranslations(:, :, i) = inv(translations(:, :, i));
+    backTranslations(:, :, i) = inv(accTranslations(:, :, i));
 end
 
 %% alpha mask

@@ -10,16 +10,21 @@ xc = (1 + width) / 2;
 cylImg = zeros([height width channel], 'like', img);
 for yt = 1 : height
     for xt = 1 : width
-        theta = (xt - xc) / f;
-        h = (yt - yc) / f;
+        % radial distortion correction
+        xd = (xt - xc) / f;
+        yd = (yt - yc) / f;
+        rSqr = xd * xd + yd * yd;
+        coeff = 1 + k1 * rSqr + k2 * rSqr * rSqr;
+        xn = xd * coeff;
+        yn = yd * coeff;
+        % cylindrical warping
+        theta = xn;
+        h = yn;
         xCap = sin(theta);
         yCap = h;
         zCap = cos(theta);
-        rCapSqr = xCap ^ 2 + yCap ^ 2;
-        xCapPrime = xCap / (1 + k1 * rCapSqr + k2 * rCapSqr ^ 2);
-        yCapPrime = yCap / (1 + k1 * rCapSqr + k2 * rCapSqr ^ 2);
-        x = f * xCapPrime / zCap + xc;
-        y = f * yCapPrime / zCap + yc;
+        x = f * xCap / zCap + xc;
+        y = f * yCap / zCap + yc;
         if x >= 1 && x <= width && y >= 1 && y <= height
             % cylImg(yt, xt, :) = img(round(y), round(x), :);
             i = floor(x);
