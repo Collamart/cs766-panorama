@@ -31,8 +31,8 @@ while true
             + (1 - a) * b * labImg1(j + 1, i, 1);
         smp2 = labImg2(p2(1), p2(2), 1);
         if smp1 > outlierThreshold && smp2 > outlierThreshold
-            smps(k, 1) = smp1;
-            smps(k, 2) = smp2;
+            smps(k, 1) = smp1 / 100;
+            smps(k, 2) = smp2 / 100;
             k = k + 1;
             if k > nSmps
                 break;
@@ -45,14 +45,14 @@ end
 fit = fitCurve(smps(:, 2), smps(:, 1));
 
 % matching exposures
-labImg2(:, :, 1) = applyCurve(labImg2(:, :, 1), fit);
+labImg2(:, :, 1) = applyCurve(labImg2(:, :, 1) / 100, fit) * 100;
 newImg2 = lab2rgb(labImg2, 'OutputType', 'uint8');
 
 % visualizing results
 % figure;
 % scatter(smps(:, 2), smps(:, 1));
 % hold on;
-% xplot = 0:100;
+% xplot = 0:0.01:1;
 % yplot = applyCurve(xplot, fit);
 % plot(xplot, yplot);
 % figure;
@@ -60,20 +60,20 @@ newImg2 = lab2rgb(labImg2, 'OutputType', 'uint8');
 
 end
 
-%% fit curve y = (1 - b) / 100 * x^2 + b * x
+%% fit curve y = y = x .^ gamma
 function [ fit ] = fitCurve(x, y)
 % parameters
 nIters = 1000;
-alpha = 0.0001;
+alpha = 1;
 % gradient descent
 m = length(x);
 fit = 1;
 for i = 1 : nIters
-    fit = fit - alpha * sum(((1 - fit) / 100 * x .* x + fit * x - y) .* (x - x .* x / 100)) / m;
+    fit = fit - alpha * sum((x .^ fit - y) .* log(x) .* (x .^ fit)) / m;
 end
 end
 
-%% apply curve y = (1 - b) / 100 * x^2 + b * x
+%% apply curve y = x .^ gamma
 function [ y ] = applyCurve(x, fit)
-y = (1 - fit) / 100 * x .* x + fit * x;
+y = x .^ fit;
 end
