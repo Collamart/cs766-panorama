@@ -1,13 +1,17 @@
+%% warp image into cylindrical coordinates and correct radial distortion
+%  input:   img - source image
+%           f - focal length
+%           k1, k2 - radial distortion parameters
+%  output:  cylImg - cylindrical warpped images
 function [ cylImg ] = cylProj( img, f, k1, k2 )
-
+% image information
 height = size(img, 1);
 width = size(img, 2);
-channel = size(img, 3);
-
 yc = (1 + height) / 2;
 xc = (1 + width) / 2;
 
-cylImg = zeros([height width channel], 'like', img);
+% image warping
+cylImg = zeros(size(img), 'like', img);
 for yt = 1 : height
     for xt = 1 : width
         % radial distortion correction
@@ -26,7 +30,6 @@ for yt = 1 : height
         x = f * xCap / zCap + xc;
         y = f * yCap / zCap + yc;
         if x >= 1 && x <= width && y >= 1 && y <= height
-            % cylImg(yt, xt, :) = img(round(y), round(x), :);
             i = floor(x);
             a = x - i;
             j = floor(y);
@@ -38,6 +41,5 @@ for yt = 1 : height
         end
     end
 end
-
 end
 
