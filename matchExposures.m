@@ -1,7 +1,58 @@
-function [ newImg2, fit ] = matchExposures( img1, img2, transform )
+%% match exposures across images
+%  input:   imgs - source images
+%           transforms - pairwise transformation matrices
+%           loop - is is a full panorama?
+%  output:  newImgs - exposure matched images
+function [ newImgs ] = matchExposures( imgs, transforms, loop )
+% image information
+nImgs = size(imgs, 4);
+
+% pairwise matching
+gammas = ones(nImgs, 1);
+for i = 2 : nImgs
+    gammas(i) = matchPair(imgs(:, :, :, i - 1), imgs(:, :, :, i), transforms(:, :, i));
+end
+
+% accumulating gammas
+if loop
+    % global optimization
+    logGammas = log(gammas);
+    logGammas(1) = [];
+    A = eye(nImgs - 2);
+    A = [A; -ones(1, nImgs - 2)];
+    newLogGammas = A \ logGammas;
+    newLogGammas = [0; newLogGammas];
+    newGammas = exp(newLogGammas);
+    
+    accGammas = ones(nImgs, 1);
+    for i = 2 : nImgs - 1
+        accGammas(i) = accGammas(i - 1) * newGammas(i);
+    end
+else
+    accGammas = ones(nImgs, 1);
+    for i = 2 : nImgs
+        accGammas(i) = accGammas(i - 1) * gammas(i);
+    end
+end
+
+% gamma correction
+newImgs = zeros(size(imgs), 'uint8');
+for i = 1 : nImgs
+    newImgs(:, :, :, i) = correctGamma(imgs(:, :, :, i), accGammas(i));
+end
+end
+
+%% match a pair of images
+%  input:   img1 - reference image
+%           img2 - source image
+%           transform - matrix to transform img2 to img1
+%  output:  gamma - gamma value to match exposures
+function [ gamma ] = matchPair(img1, img2, transform)
 % parameters
 sampleRatio = 0.01;
 outlierThreshold = 1.0;
+nIters = 1000;
+alpha = 1; % learning rate
 
 % image information
 width = size(img1, 2);
@@ -42,38 +93,27 @@ while true
 end
 
 % fitting correction curve
-fit = fitCurve(smps(:, 2), smps(:, 1));
-
-% matching exposures
-labImg2(:, :, 1) = applyCurve(labImg2(:, :, 1) / 100, fit) * 100;
-newImg2 = lab2rgb(labImg2, 'OutputType', 'uint8');
+gamma = 1;
+for i = 1 : nIters
+    gamma = gamma - alpha * sum((smps(:, 2) .^ gamma - smps(:, 1)) .*...
+        log(smps(:, 2)) .* (smps(:, 2) .^ gamma)) / nSmps;
+end
 
 % visualizing results
 % figure;
 % scatter(smps(:, 2), smps(:, 1));
 % hold on;
 % xplot = 0:0.01:1;
-% yplot = applyCurve(xplot, fit);
+% yplot = xplot .^ gamma;
 % plot(xplot, yplot);
-% figure;
-% imshowpair(img2, newImg2, 'montage');
-
 end
 
-%% fit curve y = y = x .^ gamma
-function [ fit ] = fitCurve(x, y)
-% parameters
-nIters = 1000;
-alpha = 1;
-% gradient descent
-m = length(x);
-fit = 1;
-for i = 1 : nIters
-    fit = fit - alpha * sum((x .^ fit - y) .* log(x) .* (x .^ fit)) / m;
-end
-end
-
-%% apply curve y = x .^ gamma
-function [ y ] = applyCurve(x, fit)
-y = x .^ fit;
+%% apply gamma correction
+%  input:   img - source image
+%           gamma - gamma value to match exposures
+%  output:  newImg - gamma corrected image
+function [ newImg ] = correctGamma(img, gamma)
+labImg = rgb2lab(img);
+labImg(:, :, 1) = (labImg(:, :, 1) / 100) .^ gamma * 100;
+newImg = lab2rgb(labImg, 'OutputType', 'uint8');
 end

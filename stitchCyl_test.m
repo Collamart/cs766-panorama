@@ -28,9 +28,7 @@ for i = 2 : nImgs
 end
 
 %% exposure matching
-for i = 2 : nImgs
-    cylImgs(:, :, :, i) = matchExposures(cylImgs(:, :, :, i - 1), cylImgs(:, :, :, i), translations(:, :, i));
-end
+cylImgs = matchExposures(cylImgs, translations, false);
 
 %% transformation accumulation
 accTranslations = zeros(size(translations));
