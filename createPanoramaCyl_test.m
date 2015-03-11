@@ -1,7 +1,21 @@
 %% setup vlfeat
 run([pwd '/lib/vlfeat-0.9.20/toolbox/vl_setup']);
 
-%% non-loop test
+%% non-loop test & no exposure matching & no blending
+imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgs = loadImages(imgFiles);
+newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, false, 'NoBlend');
+figure;
+imshow(newImg);
+
+%% non-loop test & exposure matching & no blending
+imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgs = loadImages(imgFiles);
+newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, true, 'NoBlend');
+figure;
+imshow(newImg);
+
+%% non-loop test & exposure matching & alpha blending
 imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
 imgs = loadImages(imgFiles);
 newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, true, 'Alpha');

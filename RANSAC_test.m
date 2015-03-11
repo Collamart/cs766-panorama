@@ -12,7 +12,7 @@ img2 = imread('TestImages/Test1-2.png');
 [potential_matches, ~] = getPotentialMatches(f1, d1, f2, d2);
 
 %% RANSAC
-homography = RANSAC(0.99, 0.3, 4, potential_matches, 2, @compHomography, @SSDHomography);
+homography = RANSAC(0.99, 0.3, 4, potential_matches, 2, @solveHomography, @compError);
 
 %% merge into panorama -- nearest neighbor
 % img = [img1 zeros(size(img1))];
