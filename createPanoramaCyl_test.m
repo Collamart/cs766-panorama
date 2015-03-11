@@ -36,3 +36,10 @@ imgs = loadImages(imgFiles);
 newImg = createPanoramaCyl(imgs, 595, -0.15, 0, true, true, 'Alpha');
 figure;
 imshow(newImg);
+
+%% Bascom Test
+imgFiles = {'TestImages/Bascom1-6.jpg', 'TestImages/Bascom1-7.jpg'};
+imgs = loadImages(imgFiles);
+newImg = createPanoramaCyl(imgs, 2300, -0.15, 0, false, false, 'Alpha');
+figure;
+imshow(newImg);
