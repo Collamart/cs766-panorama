@@ -5,6 +5,8 @@
 % 'right'
 
 %%% NOT FINISHED YET!!!!
+%%% Abandoned for several reason: 1) extremely long runtimes for min cut 2)
+%%% Could never get an adequate result.
 
 function [blendedImage] = graphCutBlending(overlapPixels, staticImage, dynamicImage, transformMatrix, rightOrLeft)
 
@@ -92,6 +94,7 @@ function [cost] = adaptedCostFunction(s,t,S,D,gS,gD)
         + norm( gD(s(1), s(2)) ) + norm( gD(t(1), t(2)) ) );
 end
 
+%% Compute weights of graph
 function [w] = weightMatrix(sOverlap, dOverlap)
     sOverlap = rgb2gray(sOverlap);
     dOverlap = rgb2gray(dOverlap);

@@ -1,5 +1,8 @@
-% simple min cut
+%% Simple min cut
 % reference: http://www.cs.dartmouth.edu/~ac/Teach/CS105-Winter05/Handouts/stoerwagner-mincut.pdf
+
+%%% CODE NEVER GET TO RUN! FAILS WHEN USED ON GRAH CUT BLENDING PROBLEM
+
 
 function [mCut] = simpleMinCut(graph, force)
 
