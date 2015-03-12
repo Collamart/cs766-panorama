@@ -1,3 +1,5 @@
+addpath(genpath('../')) % added to work with new directory structure
+
 %% test case 1
 img = imread('TestImages/TestEx1-1.jpg');
 newImg = photo2Doc(img);
@@ -15,3 +17,5 @@ img = imread('TestImages/TestEx1-3.jpg');
 newImg = photo2Doc(img);
 figure;
 imshowpair(img, newImg, 'montage');
+
+rmpath(genpath('../')) % added to work with new directory structure

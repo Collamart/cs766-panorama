@@ -58,11 +58,10 @@ mask = logical(ones(height, width));
 % merging images
 if strcmp(blend, 'Alpha')
     newImg = mergeAlpha(imgs, mask, accHomographies, newHeight, newWidth);
-else if strcmp(blend, 'Pyramid')
-        % pyramid blending here
-    else % if strcmp(blend, 'NoBlend')
-        newImg = mergeNoBlend(imgs, mask, accHomographies, newHeight, newWidth);
-    end
+elseif strcmp(blend, 'Pyramid')
+	newImg = mergePyramid( imgs, accHomographies, newHeight );
+else % if strcmp(blend, 'NoBlend')
+    newImg = mergeNoBlend(imgs, mask, accHomographies, newHeight, newWidth);
 end
 end
 

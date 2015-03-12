@@ -1,33 +1,34 @@
 % pyramid blending
 % reference: http://persci.mit.edu/pub_pdfs/spline83.pdf
 
-function [blendedImage] = pyramidBlending(overlapPixels, staticImage, dynamicImage, transformMatrix, rightOrLeft)
+% function [blendedImage] = pyramidBlending(overlapPixels, staticImage, dynamicImage, transformMatrix, rightOrLeft)
+function [newOverlap] = pyramidBlending(overlapPixels, left, right)
 N = floor(log2(overlapPixels - 1));
-hS = size(staticImage, 1);
-wS = size(staticImage, 2);
-channelsS = size(staticImage, 3);
-
-% create new dynamic image with some pixel overlap
-newDynamicImage = transformAndCrop(dynamicImage, transformMatrix, rightOrLeft, hS, wS, 25);
-% imshow(newDynamicImage);
-hD = size(newDynamicImage, 1);
-wD = size(newDynamicImage, 2);
-
-if strcmpi(rightOrLeft, 'left')
-    staticNonOverlap = staticImage(: , (overlapPixels+1):wS, :);
-    dynamicNonOverlap = newDynamicImage(: , 1:(wD-overlapPixels), :);
-    staticOverlap = staticImage(: , 1:overlapPixels, :);
-    dynamicOverlap = newDynamicImage(: , (wD-overlapPixels+1):wD, :);
-    left = dynamicOverlap;
-    right = staticOverlap;
-else
-    staticNonOverlap = staticImage(: , 1:(wS-overlapPixels), :);
-    dynamicNonOverlap = newDynamicImage(: , (overlapPixels+1):wD, :);
-    staticOverlap = staticImage(: , (wS-overlapPixels+1):wS, :);
-    dynamicOverlap = newDynamicImage(: , 1:overlapPixels, :);
-    left = staticOverlap;
-    right = dynamicOverlap;
-end
+% hS = size(staticImage, 1);
+% wS = size(staticImage, 2);
+% channelsS = size(staticImage, 3);
+% 
+% % create new dynamic image with some pixel overlap
+% newDynamicImage = transformAndCrop(dynamicImage, transformMatrix, rightOrLeft, hS, wS, overlapPixels);
+% % imshow(newDynamicImage);
+% hD = size(newDynamicImage, 1);
+% wD = size(newDynamicImage, 2);
+% 
+% if strcmpi(rightOrLeft, 'left')
+%     staticNonOverlap = staticImage(: , (overlapPixels+1):wS, :);
+%     dynamicNonOverlap = newDynamicImage(: , 1:(wD-overlapPixels), :);
+%     staticOverlap = staticImage(: , 1:overlapPixels, :);
+%     dynamicOverlap = newDynamicImage(: , (wD-overlapPixels+1):wD, :);
+%     left = dynamicOverlap;
+%     right = staticOverlap;
+% else
+%     staticNonOverlap = staticImage(: , 1:(wS-overlapPixels), :);
+%     dynamicNonOverlap = newDynamicImage(: , (overlapPixels+1):wD, :);
+%     staticOverlap = staticImage(: , (wS-overlapPixels+1):wS, :);
+%     dynamicOverlap = newDynamicImage(: , 1:overlapPixels, :);
+%     left = staticOverlap;
+%     right = dynamicOverlap;
+% end
 
 % imshow(left);
 % imshow(right);
@@ -78,16 +79,16 @@ for l = 1:N+1
     end
 end
 
-newOverlap = zeros(size(staticOverlap));
+newOverlap = zeros(size(left));
 for i = 1: N+1
     newOverlap(:,:,:) = newOverlap(:,:,:) + LS(:,:,:,i);
 end
 
-if strcmpi(rightOrLeft, 'left')
-    blendedImage = [dynamicNonOverlap uint8(newOverlap) staticNonOverlap];
-else
-    blendedImage = [staticNonOverlap uint8(newOverlap) dynamicNonOverlap];
-end
+% if strcmpi(rightOrLeft, 'left')
+%     blendedImage = [dynamicNonOverlap uint8(newOverlap) staticNonOverlap];
+% else
+%     blendedImage = [staticNonOverlap uint8(newOverlap) dynamicNonOverlap];
+% end
 
 % 
 % 

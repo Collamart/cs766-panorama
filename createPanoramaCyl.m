@@ -81,11 +81,10 @@ mask = logical(cylProj(mask, f, k1, k2));
 % merging images
 if strcmp(blend, 'Alpha')
     newImg = mergeAlpha(cylImgs, mask, accTranslations, newHeight, newWidth);
-else if strcmp(blend, 'Pyramid')
-        % pyramid blending here
-    else % if strcmp(blend, 'NoBlend')
-        newImg = mergeNoBlend(cylImgs, mask, accTranslations, newHeight, newWidth);
-    end
+elseif strcmp(blend, 'Pyramid')
+    newImg = mergePyramid( cylImgs, accTranslations, newHeight );
+else % if strcmp(blend, 'NoBlend')
+    newImg = mergeNoBlend(cylImgs, mask, accTranslations, newHeight, newWidth);
 end
 
 % cropping image
