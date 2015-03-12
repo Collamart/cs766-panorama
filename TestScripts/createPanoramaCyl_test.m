@@ -1,3 +1,5 @@
+%% A test script to evaluate functions to create panoramas using the cylindrical projection method
+
 addpath(genpath('../')) % added to work with new directory structure
 
 %% setup vlfeat

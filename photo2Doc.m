@@ -1,3 +1,6 @@
+%% align an image as a document (use homography to transform it into a rectangle)
+%  input:   img - source image to align
+%  output:  newImg - the image aligned as a document
 function [ newImg ] = photo2Doc( img )
 % image information
 width = size(img, 2);

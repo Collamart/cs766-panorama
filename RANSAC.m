@@ -1,14 +1,13 @@
-%% RANSAC function for homography panorama -> computes best setting of parameters
-
-%Parameters:
-% P -> probability of 1 success (0.99) is a good setting
-% p -> probability of real inlier (can be pesimistic, try 0.5)
-% n -> number of sample each run
-% data -> the data points
-% epsilon -> threshold for inlier
-% settingFunctionHandle -> function that computes parameter values (homography, translation, etc.)
-% SSDFunctionHanle -> function to compute the error measure
-
+%% RANSAC function for feature matching. Computes the best setting of parameters.
+%  input:   P - probability of having at least 1 success (0.99 is a good setting)
+%           p - probability of a real inlier (can be pesimistic, try 0.5)
+%           n - number of samples each run
+%           data - the data points of interest
+%           epsilon - threshold for inlier
+%           settingFunctionHandle - handle to function to compute parameter values (homography, translation, etc.)
+%           SSDFunctionHanle - handle to function to compute the error measure
+%  output:  H - homography matrix that transforms points in image2
+%               to points in image1, 3 x 3 matrix
 function [bestSetting] = RANSAC(P, p, n, data, epsilon, settingFunctionHandle, SSDFunctionHandle)
 
 k = ceil(log(1 - P) / log(1 - p^n)); % calculate number of loops

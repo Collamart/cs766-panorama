@@ -1,8 +1,15 @@
+%% Applies a transform to build a section of the final image
+%  input:   img - the img to transform
+%           transform - the 3x3 transform matrix to apply to the image
+%           fullImageHeight - the height (in pixels) of the final image
+%  output:  transImg - the image after applying the transform
+%           extent - a structure that contains critical coordinate
+%           information of this image in the final image reference frame
 function [transImg, extent] = transformImage(img, transform, fullImageHeight)
     w = size(img,2);
     h = size(img,1);
     
-    % critical points
+    % compute critical points (corners) after tranform
     topRight = transform * [1 ; w ; 1];
     topRight = floor(topRight ./ topRight(3));
     

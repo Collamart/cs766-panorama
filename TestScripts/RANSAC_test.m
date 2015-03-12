@@ -1,7 +1,9 @@
+%% A test script to evaluate our RANSAC method
+
 addpath(genpath('../')) % added to work with new directory structure
 
 %% setup vlfeat
-run([pwd '/../lib/vlfeat-0.9.20/toolbox/vl_setup']);
+run(['../lib/vlfeat-0.9.20/toolbox/vl_setup']);
 
 %% RANSAC test for homography
 

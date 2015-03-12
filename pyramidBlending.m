@@ -1,69 +1,36 @@
-% pyramid blending
-% reference: http://persci.mit.edu/pub_pdfs/spline83.pdf
-
-% function [blendedImage] = pyramidBlending(overlapPixels, staticImage, dynamicImage, transformMatrix, rightOrLeft)
+%% Pyramid blending technique
+% Reference: http://persci.mit.edu/pub_pdfs/spline83.pdf
+%  input:   overlapPixels - the width of the overlap region
+%           left - overlap region taken from the left image
+%           right - overlap region taken from the right image
+%  output:  newOverlap - the blended overlap region
 function [newOverlap] = pyramidBlending(overlapPixels, left, right)
 N = floor(log2(overlapPixels - 1));
-% hS = size(staticImage, 1);
-% wS = size(staticImage, 2);
-% channelsS = size(staticImage, 3);
-% 
-% % create new dynamic image with some pixel overlap
-% newDynamicImage = transformAndCrop(dynamicImage, transformMatrix, rightOrLeft, hS, wS, overlapPixels);
-% % imshow(newDynamicImage);
-% hD = size(newDynamicImage, 1);
-% wD = size(newDynamicImage, 2);
-% 
-% if strcmpi(rightOrLeft, 'left')
-%     staticNonOverlap = staticImage(: , (overlapPixels+1):wS, :);
-%     dynamicNonOverlap = newDynamicImage(: , 1:(wD-overlapPixels), :);
-%     staticOverlap = staticImage(: , 1:overlapPixels, :);
-%     dynamicOverlap = newDynamicImage(: , (wD-overlapPixels+1):wD, :);
-%     left = dynamicOverlap;
-%     right = staticOverlap;
-% else
-%     staticNonOverlap = staticImage(: , 1:(wS-overlapPixels), :);
-%     dynamicNonOverlap = newDynamicImage(: , (overlapPixels+1):wD, :);
-%     staticOverlap = staticImage(: , (wS-overlapPixels+1):wS, :);
-%     dynamicOverlap = newDynamicImage(: , 1:overlapPixels, :);
-%     left = staticOverlap;
-%     right = dynamicOverlap;
-% end
 
-% imshow(left);
-% imshow(right);
-
+% initialize matrices for gaussian pyramid
 GA = zeros([size(left) N+1]);
 GB = zeros([size(right) N+1]);
 GA(:,:,:,1) = left(:,:,:);
 GB(:,:,:,1) = right(:,:,:);
 
-% imshow(uint8(GA(:,:,:,1)));
-% imshow(uint8(GB(:,:,:,1)));
-
-% build pyramid
+% build gaussian pyramid
 gKernel = fspecial('gaussian',5);
 for i = 2:N+1
     GA(:,:,:,i) = imfilter(GA(:,:,:,i-1),gKernel,'conv');
     GB(:,:,:,i) = imfilter(GB(:,:,:,i-1),gKernel,'conv');
-    
-%     imshow(uint8(GA(:,:,:,i)));
-%     imshow(uint8(GB(:,:,:,i)));
 end
 
-% laplacians
+% build laplacian pyramid from difference of gaussians
 LA = zeros([size(left) N+1]);
 LB = zeros([size(right) N+1]);
 for i = 1:N
     LA(:,:,:,i) = GA(:,:,:,i) - GA(:,:,:,i+1);
     LB(:,:,:,i) = GB(:,:,:,i) - GB(:,:,:,i+1);
-    
-%     imshow(uint8(LA(:,:,:,i)));
-%     imshow(uint8(LB(:,:,:,i)));
 end
 LA(:,:,:,N+1) = GA(:,:,:,N+1);
 LB(:,:,:,N+1) = GB(:,:,:,N+1);
 
+% build each side of the overlap region by summing the laplacians
 LS = zeros(size(LA));
 for l = 1:N+1
     for i = 1:size(LA,1)
@@ -84,23 +51,4 @@ for i = 1: N+1
     newOverlap(:,:,:) = newOverlap(:,:,:) + LS(:,:,:,i);
 end
 
-% if strcmpi(rightOrLeft, 'left')
-%     blendedImage = [dynamicNonOverlap uint8(newOverlap) staticNonOverlap];
-% else
-%     blendedImage = [staticNonOverlap uint8(newOverlap) dynamicNonOverlap];
-% end
-
-% 
-% 
-% newLevel = 
-% figure;imshow(newLevel);
-
 end
-
-% function [expanded] = expand(G, l, k)
-%     for i = size(G,1)
-%         for j = size(G,2)
-%             expanded(i,j,:,l)
-%         end
-%     end
-% end

@@ -1,7 +1,9 @@
-%% function returns potential feature matches between two images. uses VLFeat library
-
-%% input: fx -> feature matrix for image x; dx -> descriptor matrix for image x
-
+%% function to return potential feature matches between two images. Uses the VLFeat library.
+%  input:   f1, f2 - vector of SIFT feature locations and scales for images 1 and 2
+%           d1, d2 - vector of SIFT feature descriptors that correspond
+%           with f1, f2
+%  output:  potential_matches - 3 x n x 2 matrix of [x y z=1] positions for n potential feature matches in images 1 and 2
+%           scores - the score for each of the n matches in a vector
 function [potential_matches, scores] = getPotentialMatches(f1, d1, f2, d2)
 
 [matches, scores] = vl_ubcmatch(d1, d2);
