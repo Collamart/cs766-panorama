@@ -216,7 +216,7 @@ end
 switch get(get(handles.blend_opt,'SelectedObject'),'Tag')
     case 'blend_none',  blend = 'NoBlend';
     case 'blend_alpha',  blend = 'Alpha';
-    case 'blend_ptr',  blend = 'Pyramid';
+    case 'blend_pyr',  blend = 'Pyramid';
     otherwise, blend = 'NoBlend'; % default... should never happen
 end
 
