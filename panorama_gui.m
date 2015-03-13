@@ -134,10 +134,10 @@ if isappdata(handles.figure,'full_img')
     rmappdata(handles.figure,'full_img')
 end
 
-if isappdata(handles.figure,'finalImg')
-    ax = getappdata(handles.figure,'finalImg');
+if isappdata(handles.figure,'finalImgAxes')
+    ax = getappdata(handles.figure,'finalImgAxes');
     cla(ax);
-    rmappdata(handles.figure,'finalImg');
+    rmappdata(handles.figure,'finalImgAxes');
 end
 
 % init axes
@@ -195,6 +195,16 @@ function stitch_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+%reset
+if isappdata(handles.figure,'finalImgAxes')
+    ax = getappdata(handles.figure,'finalImgAxes');
+    cla(ax);
+    rmappdata(handles.figure,'finalImgAxes');
+end
+if isappdata(handles.figure,'full_img')
+    rmappdata(handles.figure,'full_img')
+end
+
 % extract exposure correction
 switch get(get(handles.exp_corr,'SelectedObject'),'Tag')
     case 'exp_on',  matchExp = true;
@@ -251,15 +261,6 @@ close(h);
 full_img = uint8(full_img);
 
 %display on gui
-if isappdata(handles.figure,'finalImg')
-    ax = getappdata(handles.figure,'finalImg');
-    cla(ax);
-    rmappdata(handles.figure,'finalImg');
-end
-if isappdata(handles.figure,'full_img')
-    rmappdata(handles.figure,'full_img')
-end
-
 imageProp = {'ButtonDownFcn'};
 imageVal = {'enlargeImage( guidata(gcf) )'};
 x = 1 - 0.98; % x position (1 column)
@@ -274,7 +275,7 @@ axis(finalImgAxes,'image');
 axis(finalImgAxes,'off');
 
 setappdata(handles.figure,'full_img',full_img);
-setappdata(handles.figure,'finalImg',finalImg);
+setappdata(handles.figure,'finalImgAxes',finalImgAxes);
 
 
 % --- Executes on button press in cyl_loop.
