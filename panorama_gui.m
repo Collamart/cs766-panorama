@@ -22,7 +22,7 @@ function varargout = panorama_gui(varargin)
 
 % Edit the above text to modify the response to help panorama_gui
 
-% Last Modified by GUIDE v2.5 12-Mar-2015 14:42:22
+% Last Modified by GUIDE v2.5 12-Mar-2015 18:52:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,8 +58,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% setup vlfeat
+run('lib/vlfeat-0.9.20/toolbox/vl_setup');
+
 % UIWAIT makes panorama_gui wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.figure);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -102,29 +105,250 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --------------------------------------------------------------------
-function menu_Callback(hObject, eventdata, handles)
-% hObject    handle to menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
+% --- Executes on button press in load.
 function load_Callback(hObject, eventdata, handles)
 % hObject    handle to load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.slider,'Value',1.0); % reset slider
+[fNames fPath] = uigetfile({'*.jpg;*.tif;*.png;*.gif','All Image Files'; ...
+    '*.*','All Files' },'Select Images','MultiSelect','on');
 
-% --------------------------------------------------------------------
-function hom_Callback(hObject, eventdata, handles)
-% hObject    handle to hom (see GCBO)
+set(handles.slider,'Value',0.0); % reset slider
+
+%return if no values
+if ~iscell(fNames)
+    return
+end
+
+% get filenames
+size = length(fNames);
+files = cell([1 size]);
+for i = 1:size
+    files(i) = fullfile(fPath, fNames(i));
+end
+files = fliplr(files)
+imgs = loadImages(files);
+
+% reset final img
+if isappdata(handles.figure,'full_img')
+    rmappdata(handles.figure,'full_img')
+end
+
+if isappdata(handles.figure,'finalImg')
+    ax = getappdata(handles.figure,'finalImg');
+    cla(ax);
+    rmappdata(handles.figure,'finalImg');
+end
+
+% init axes
+hAxes = getappdata(handles.figure,'hAxes');
+if ~isempty(hAxes)
+    f = find ( ishandle(hAxes) & hAxes);
+    delete(hAxes(f));
+end
+hAxes = zeros(size,1);
+
+axesProp = {'DataAspectRatio' ,'Parent','PlotBoxAspectRatio','XGrid','YGrid'};
+axesVal = {[1.0 1.0 1.0], handles.single, [1.0 1.0 1.0], 'off', 'off'};
+imageProp = {'ButtonDownFcn'};
+imageVal = {'enlargeImage( guidata(gcf) )'};
+
+wid = 0.5 * size;
+if wid < 1
+    wid = 1;
+end
+po = 1.0 - wid;
+pos = get(handles.single, 'Position');
+pos(3) = wid;
+pos(1) = 0;
+set(handles.single, 'Position', pos);
+
+% image position constants
+y = 1 - 0.98; % x position (1 row)
+rPitch = 0.98/size;
+axHight = 0.9/1;
+axWidth = 0.9/size;
+
+% post images into LDR panel
+h = waitbar(0, 'Loading images...'); % start progress bar
+for i = 1:size
+    % create axes
+    x = 1 - (i) * rPitch; % x position
+    hAxes(i) = axes('Position', [x y axWidth axHight], axesProp, axesVal);
+    
+    % draw image in axes
+    imagesc(imgs(:,:,:,i),'Parent',hAxes(i),imageProp,imageVal);
+    axis(hAxes(i),'image');
+    axis(hAxes(i),'off');
+    
+    waitbar(i / size); % progress bar update
+end
+
+close(h);
+set(handles.stitch,'Enable','on');
+setappdata(handles.figure,'hAxes',hAxes);
+setappdata(handles.figure,'images',flip(imgs,4));
+
+% --- Executes on button press in stitch.
+function stitch_Callback(hObject, eventdata, handles)
+% hObject    handle to stitch (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% extract exposure correction
+switch get(get(handles.exp_corr,'SelectedObject'),'Tag')
+    case 'exp_on',  matchExp = true;
+    case 'exp_off',  matchExp = false;
+    otherwise, matchExp = true; % default... should never happen
+end
 
-% --------------------------------------------------------------------
-function cyl_Callback(hObject, eventdata, handles)
-% hObject    handle to cyl (see GCBO)
+% extract blending type
+switch get(get(handles.blend_opt,'SelectedObject'),'Tag')
+    case 'blend_none',  blend = 'NoBlend';
+    case 'blend_alpha',  blend = 'Alpha';
+    case 'blend_ptr',  blend = 'Pyramid';
+    otherwise, blend = 'NoBlend'; % default... should never happen
+end
+
+% extract type and compute
+imgs = getappdata(handles.figure,'images');
+h = waitbar(0, 'Building panorama...'); % start progress bar
+switch get(get(handles.construct_opt,'SelectedObject'),'Tag')
+    case 'cyl'
+        % load cylindrical properties
+        f = str2double(get(handles.cyl_f,'String'));
+        k1 = str2double(get(handles.cyl_k1,'String'));
+        k2 = str2double(get(handles.cyl_k2,'String'));
+        loop = get(handles.cyl_loop,'Value');
+        
+        %check
+        if isempty(f) || isempty(k1) || isempty(k2)
+            warndlg('All parameters for cylindrical options must be set and numbers!');
+            return;
+        end
+        
+        %compute
+        full_img = createPanoramaCyl(imgs, f, k1, k2, loop, matchExp, blend);
+    case 'hom'
+        full_img = createPanoramaPla(imgs, matchExp, blend);
+    otherwise % cylindrical by default
+        % load cylindrical properties
+        f = str2double(get(handles.cyl_f,'String'));
+        k1 = str2double(get(handles.cyl_k1,'String'));
+        k2 = str2double(get(handles.cyl_k2,'String'));
+        loop = get(handles.cyl_loop,'Value');
+        
+        %check
+        if isempty(f) || isempty(k1) || isempty(k2)
+            warndlg('All parameters for cylindrical options must be set and numbers!');
+            return;
+        end
+        
+        %compute
+        full_img = createPanoramaCyl(imgs, f, k1, k2, loop, matchExp, blend);
+end
+close(h);
+full_img = uint8(full_img);
+
+%display on gui
+if isappdata(handles.figure,'finalImg')
+    ax = getappdata(handles.figure,'finalImg');
+    cla(ax);
+    rmappdata(handles.figure,'finalImg');
+end
+if isappdata(handles.figure,'full_img')
+    rmappdata(handles.figure,'full_img')
+end
+
+imageProp = {'ButtonDownFcn'};
+imageVal = {'enlargeImage( guidata(gcf) )'};
+x = 1 - 0.98; % x position (1 column)
+y = 1 - 0.98; % y position (1 row)
+axWidth = 0.96;
+axHight = 0.96;
+axesProp = {'DataAspectRatio' ,'Parent','PlotBoxAspectRatio','XGrid','YGrid'};
+axesVal = {[1.0 1.0 1.0], handles.final, [1.0 1.0 1.0], 'off', 'off'};
+finalImgAxes = axes('Position', [x y axWidth axHight], axesProp, axesVal);
+imagesc(full_img,'Parent',finalImgAxes,imageProp,imageVal);
+axis(finalImgAxes,'image');
+axis(finalImgAxes,'off');
+
+setappdata(handles.figure,'full_img',full_img);
+setappdata(handles.figure,'finalImg',finalImg);
+
+
+% --- Executes on button press in cyl_loop.
+function cyl_loop_Callback(hObject, eventdata, handles)
+% hObject    handle to cyl_loop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of cyl_loop
+
+
+function cyl_f_Callback(hObject, eventdata, handles)
+% hObject    handle to cyl_f (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of cyl_f as text
+%        str2double(get(hObject,'String')) returns contents of cyl_f as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function cyl_f_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to cyl_f (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function cyl_k2_Callback(hObject, eventdata, handles)
+% hObject    handle to cyl_k2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of cyl_k2 as text
+%        str2double(get(hObject,'String')) returns contents of cyl_k2 as a double
+
+    
+% --- Executes during object creation, after setting all properties.
+function cyl_k2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to cyl_k2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function cyl_k1_Callback(hObject, eventdata, handles)
+% hObject    handle to cyl_k1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of cyl_k1 as text
+%        str2double(get(hObject,'String')) returns contents of cyl_k1 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function cyl_k1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to cyl_k1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
