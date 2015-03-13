@@ -1,9 +1,6 @@
 %% A test script to evaluate functions to create panoramas using the cylindrical projection method
-
-addpath(genpath('../')) % added to work with new directory structure
-
 %% setup vlfeat
-run(['../lib/vlfeat-0.9.20/toolbox/vl_setup']);
+run([pwd '/lib/vlfeat-0.9.20/toolbox/vl_setup']);
 
 %% non-loop test & no exposure matching & no blending
 imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
@@ -19,17 +16,17 @@ newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, true, 'NoBlend');
 figure;
 imshow(newImg);
 
-%% non-loop test & exposure matching & pyramid blending
-imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
-imgs = loadImages(imgFiles);
-newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, false, 'Pyramid');
-figure;
-imshow(newImg);
-
 %% non-loop test & exposure matching & alpha blending
 imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
 imgs = loadImages(imgFiles);
 newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, true, 'Alpha');
+figure;
+imshow(newImg);
+
+%% non-loop test & exposure matching & pyramid blending
+imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg', 'TestImages/Test2-3.jpg'};
+imgs = loadImages(imgFiles);
+newImg = createPanoramaCyl(imgs, 595, -0.15, 0, false, true, 'Pyramid');
 figure;
 imshow(newImg);
 
@@ -59,7 +56,7 @@ imgFiles = {'TestImages/Test2-1.jpg', 'TestImages/Test2-2.jpg',...
     'TestImages/Test2-15.jpg', 'TestImages/Test2-16.jpg',...
     'TestImages/Test2-17.jpg', 'TestImages/Test2-18.jpg'};
 imgs = loadImages(imgFiles);
-newImg = createPanoramaCyl(imgs, 595, -0.15, 0, true, false, 'Pyramid');
+newImg = createPanoramaCyl(imgs, 595, -0.15, 0, true, true, 'Pyramid');
 figure;
 imshow(newImg);
 
@@ -86,5 +83,3 @@ imgs = loadImages(imgFiles);
 newImg = createPanoramaCyl(imgs, 575, -0.15, 0, false, false, 'Pyramid');
 figure;
 imshow(newImg);
-
-rmpath(genpath('../')) % added to work with new directory structure
