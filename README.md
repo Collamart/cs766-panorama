@@ -31,18 +31,18 @@ This is a brief description of our implementation. More details can be found in 
 
 ## Program Screenshot:
 
-[[TestImages/gui_screenshot.png|alt=gui_screenshot]]
+![](TestImages/gui_screenshot.png)
 
 ## Image to be Vote:
 
 ### Bascom Hill Panorama (Planar)
 
-[[images/BascomPla.jpg|alt=BascomPla]]
+![](InteractiveViewer/Bascom2.jpg)
 
 View the [high-resolution interactive version](http:///)
 
 ### Bascom Hill Panorama (Cylindrical)
 
-[[images/BascomCyl.jpg|alt=BascomCyl]]
+![](InteractiveViewer/Bascom1.jpg)
 
 View the [high-resolution interactive version](http:///)
