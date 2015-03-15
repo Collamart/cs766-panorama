@@ -39,7 +39,7 @@ This is a brief description of our implementation. More details can be found in 
 
 ![](InteractiveViewer/Bascom2.jpg)
 
-View the [high-resolution interactive version](http:///)
+View the [high-resolution interactive version] (//InteractiveViewer//Bascom2.html)
 
 ### Bascom Hill Panorama (Cylindrical)
 
