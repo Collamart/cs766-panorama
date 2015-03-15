@@ -1,4 +1,4 @@
-# cs766-panarama
+# cs766-panorama Project
 
 ## Group Members:
 Ke Ma, Christopher Bodden
@@ -9,20 +9,40 @@ Image stitching is a technique to combine a set of images into a larger image by
 ## Features:
 This is a brief description of our implementation. More details can be found in the other pages of the wiki.
 
-### Basic Features:
-* Warping to cylindrical coordinates
-* Alignment computation using SIFT features and RANSAC
-* Stitching and cropping with feather blending
-* Interactive viewer page
+### Basic Features
 
-### "Bonus" Features:
-* Warping, alignment, stitching, and cropping using homographies
+* Cylindrical warping
+* Image alignment with SIFT and RANSAC
+* Image stitching with alpha blending
+* Cylindrical panorama creation with end-to-end alignment
+* Interactive panorama viewer
+
+### "Bonus" Features
+
+* Lens distortion correction
+* Planar panorama creation via homography
 * Exposure correction
 * Pyramid blending
-* Image to doc straightening
+* "Photo to Document"
+
+### Features Attempted But Not Fully Functional
+
+* Graph Cut Blending - There were issues with the minimum cut algorithm as well as concerns about practicality (the runtime was extremely long to cut the graph even for small images).
 
 ## Program Screenshot:
-<TODO>
+
+[[TestImages/gui_screenshot.png|alt=gui_screenshot]]
 
 ## Image to be Vote:
-<TODO>
+
+### Bascom Hill Panorama (Planar)
+
+[[images/BascomPla.jpg|alt=BascomPla]]
+
+View the [high-resolution interactive version](http:///)
+
+### Bascom Hill Panorama (Cylindrical)
+
+[[images/BascomCyl.jpg|alt=BascomCyl]]
+
+View the [high-resolution interactive version](http:///)
