@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Ke Ma" />
+  <meta name="author" content="Christopher Bodden" />
+  <title>CS 766 - Panorama Project Documentation - CS 766 - Panorama Project Documentation</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">CS 766 - Panorama Project Documentation</h1>
+<h2 class="author">Ke Ma</h2>
+<h2 class="author">Christopher Bodden</h2>
+<h3 class="date">3/16/2015</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#project-overview">Project Overview</a><ul>
+<li><a href="#links">Links</a></li>
+<li><a href="#assignment-description">Assignment Description</a></li>
+<li><a href="#features">Features</a><ul>
+<li><a href="#basic-features">Basic Features</a></li>
+<li><a href="#bonus-features">“Bonus” Features</a></li>
+<li><a href="#features-attempted-but-not-fully-functional">Features Attempted But Not Fully Functional</a></li>
+</ul></li>
+<li><a href="#program-screenshot">Program Screenshot</a></li>
+<li><a href="#image-to-be-vote-bascom-hill">Image to be Vote: <em>Bascom Hill</em></a><ul>
+<li><a href="#bascom-hill-panorama-planar">Bascom Hill Panorama (Planar)</a></li>
+<li><a href="#bascom-hill-panorama-cylindrical">Bascom Hill Panorama (Cylindrical)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#results">Results</a><ul>
+<li><a href="#planar-panorama">Planar Panorama</a><ul>
+<li><a href="#original-planar-panorama">Original Planar Panorama</a></li>
+<li><a href="#planar-panorama-w-alpha-blending">Planar Panorama w/ Alpha Blending</a></li>
+<li><a href="#planar-panorama-w-pyramid-blending">Planar Panorama w/ Pyramid Blending</a></li>
+</ul></li>
+<li><a href="#cylindrical-panorama">Cylindrical Panorama</a><ul>
+<li><a href="#original-cylindrical-panorama">Original Cylindrical Panorama</a></li>
+<li><a href="#cylindrical-panorama-w-end-to-end-alignment">Cylindrical Panorama w/ End-to-end Alignment</a></li>
+<li><a href="#cylindrical-panorama-w-exposure-correction">Cylindrical Panorama w/ Exposure Correction</a></li>
+<li><a href="#cylindrical-panorama-w-alpha-blending">Cylindrical Panorama w/ Alpha Blending</a></li>
+<li><a href="#cylindrical-panorama-w-pyramid-blending">Cylindrical Panorama w/ Pyramid Blending</a></li>
+</ul></li>
+<li><a href="#image-to-be-vote-bascom-hill-1">Image to be Vote: <em>Bascom Hill</em></a><ul>
+<li><a href="#bascom-hill-panorama-planar-1">Bascom Hill Panorama (Planar)</a></li>
+<li><a href="#bascom-hill-panorama-cylindrical-1">Bascom Hill Panorama (Cylindrical)</a></li>
+<li><a href="#camera-calibration">Camera Calibration</a></li>
+</ul></li>
+<li><a href="#another-extension-photo-to-document">Another Extension: <em>Photo to Document</em></a></li>
+</ul></li>
+<li><a href="#using-the-gui">Using the GUI</a><ul>
+<li><a href="#loading-images">Loading Images</a></li>
+<li><a href="#selecting-construction-method">Selecting Construction Method</a></li>
+<li><a href="#selecting-blending-method">Selecting Blending Method</a></li>
+<li><a href="#exposure-correction">Exposure Correction</a></li>
+<li><a href="#cylindrical-construction-options">Cylindrical Construction Options</a></li>
+<li><a href="#stitching">Stitching</a></li>
+<li><a href="#saving-enlarging-images">Saving &amp; Enlarging Images</a></li>
+</ul></li>
+<li><a href="#function-descriptions">Function Descriptions</a><ul>
+<li><a href="#panorama_gui.m">panorama_gui.m</a></li>
+<li><a href="#loadimages.m">loadImages.m</a></li>
+<li><a href="#comperror.m">compError.m</a></li>
+<li><a href="#createpanoramacyl.m">createPanoramaCyl.m</a></li>
+<li><a href="#createpanoramapla.m">createPanoramaPla.m</a></li>
+<li><a href="#cylproj.m">cylProj.m</a></li>
+<li><a href="#estimatehomographies.m">estimateHomographies.m</a></li>
+<li><a href="#solvetranslation.m">solveTranslation.m</a></li>
+<li><a href="#solvehomography.m">solveHomography.m</a></li>
+<li><a href="#ransac.m">RANSAC.m</a></li>
+<li><a href="#photo2doc.m">photo2Doc.m</a></li>
+<li><a href="#mergepyramid.m">mergePyramid.m</a></li>
+<li><a href="#mergenoblend.m">mergeNoBlend.m</a></li>
+<li><a href="#mergealpha.m">mergeAlpha.m</a></li>
+<li><a href="#matchexposures.m">matchExposures.m</a></li>
+<li><a href="#getsiftfeatures.m">getSIFTFeatures.m</a></li>
+<li><a href="#getpotentialmatches.m">getPotentialMatches.m</a></li>
+<li><a href="#estimatetranslations.m">estimateTranslations.m</a></li>
+</ul></li>
+<li><a href="#other-files">Other Files</a><ul>
+<li><a href="#enlargeimage.m"><em>enlargeImage.m</em></a></li>
+<li><a href="#panorama_gui.fig"><em>panorama_gui.fig</em></a></li>
+<li><a href="#testscriptscreatepanoramacyl_test.m"><em>TestScripts\createPanoramaCyl_test.m</em></a></li>
+<li><a href="#testscriptscreatepanoramapla_test.m"><em>TestScripts\createPanoramaPla_test.m</em></a></li>
+<li><a href="#testscriptscylproj_test.m"><em>TestScripts\cylProj_test.m</em></a></li>
+<li><a href="#testscriptsphoto2doc_test.m"><em>TestScripts\photo2Doc_test.m</em></a></li>
+<li><a href="#testscriptsransac_test.m"><em>TestScripts\RANSAC_test.m</em></a></li>
+</ul></li>
+<li><a href="#credits">Credits</a><ul>
+<li><a href="#ke-ma">Ke Ma</a></li>
+<li><a href="#christopher-bodden">Christopher Bodden</a></li>
+</ul></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<h1 id="project-overview">Project Overview</h1>
+<h2 id="links">Links</h2>
+<ul>
+<li>Repository: <a href="https://github.com/cbod/cs766-panarama" class="uri">https://github.com/cbod/cs766-panarama</a></li>
+<li>Wiki: <a href="https://github.com/cbod/cs766-panarama/wiki" class="uri">https://github.com/cbod/cs766-panarama/wiki</a></li>
+</ul>
+<h2 id="assignment-description">Assignment Description</h2>
+<p>Image stitching is a technique to combine a set of images into a larger image by registering, warping, resampling and blending them together. A popular application of image stitching is to create panoramas. Generally speaking, there are two classes of methods for image stitching: direct methods and feature-based methods. In this project we implement a feature-based method using SIFT features.</p>
+<h2 id="features">Features</h2>
+<p>This is a brief description of our implementation. More details can be found in the other pages of the wiki.</p>
+<h3 id="basic-features">Basic Features</h3>
+<ul>
+<li>Cylindrical warping</li>
+<li>Image alignment with SIFT and RANSAC</li>
+<li>Image stitching with alpha blending</li>
+<li>Cylindrical panorama creation with end-to-end alignment</li>
+<li>Interactive panorama viewer</li>
+</ul>
+<h3 id="bonus-features">“Bonus” Features</h3>
+<ul>
+<li>Lens distortion correction</li>
+<li>Planar panorama creation via homography</li>
+<li>Exposure correction</li>
+<li>Pyramid blending</li>
+<li>“Photo to Document”</li>
+</ul>
+<h3 id="features-attempted-but-not-fully-functional">Features Attempted But Not Fully Functional</h3>
+<ul>
+<li>Graph Cut Blending - There were issues with the minimum cut algorithm as well as concerns about practicality (the runtime was extremely long to cut the graph even for small images).</li>
+</ul>
+<h2 id="program-screenshot">Program Screenshot</h2>
+<div class="figure">
+<img src="images/gui_screenshot.png" />
+
+</div>
+<h2 id="image-to-be-vote-bascom-hill">Image to be Vote: <em>Bascom Hill</em></h2>
+<h3 id="bascom-hill-panorama-planar">Bascom Hill Panorama (Planar)</h3>
+<div class="figure">
+<img src="InteractiveViewer/Bascom2.jpg" />
+
+</div>
+<p>View the <a href="InteractiveViewer/Bascom2.html">high-resolution interactive version</a></p>
+<h3 id="bascom-hill-panorama-cylindrical">Bascom Hill Panorama (Cylindrical)</h3>
+<div class="figure">
+<img src="InteractiveViewer/Bascom1.jpg" />
+
+</div>
+<p>View the <a href="InteractiveViewer/Bascom1.html">high-resolution interactive version</a></p>
+<h1 id="results">Results</h1>
+<p>We developed methods to create two types of panorama images: planar panorama and cylindrical panorama. To be specific, we implemented the following algorithms:</p>
+<ul>
+<li>SIFT feature description and matching (<a href="http://www.vlfeat.org/"></a>)</li>
+<li>RANSAC</li>
+<li>Homography and translation solver</li>
+<li>Cylindrical warping with lens distortion correction</li>
+<li>End-to-end alignment for full panoramas</li>
+<li>Exposure correction</li>
+<li>Alpha blending</li>
+<li>Pyramid blending</li>
+</ul>
+<h2 id="planar-panorama">Planar Panorama</h2>
+<p>Planar panorama is created by transforming source images into the coordinate system of a reference image via homography transformations.</p>
+<h3 id="original-planar-panorama">Original Planar Panorama</h3>
+<div class="figure">
+<img src="images/Pla.jpg" />
+
+</div>
+<p>Because no blending is applied, there is an obvious seam between the stitched images.</p>
+<h3 id="planar-panorama-w-alpha-blending">Planar Panorama w/ Alpha Blending</h3>
+<div class="figure">
+<img src="images/PlaAlpha.jpg" />
+
+</div>
+<p>Alpha blending mitigates the seam, but introduces some ghosting effects due to the minor misalignments.</p>
+<h3 id="planar-panorama-w-pyramid-blending">Planar Panorama w/ Pyramid Blending</h3>
+<div class="figure">
+<img src="images/PlaPyramid.jpg" />
+
+</div>
+<p>Pyramid blending solves both the seam and the ghosting problems (although there are still some ghosting effects near the center line of the overlapping region).</p>
+<h2 id="cylindrical-panorama">Cylindrical Panorama</h2>
+<p>Cylindrical panorama is created by first warping source images into the cylindrical coordinate system and then aligning them via translations. The advantage is the ability to create 360-degree full panoramas.</p>
+<h3 id="original-cylindrical-panorama">Original Cylindrical Panorama</h3>
+<div class="figure">
+<img src="images/Cyl.jpg" />
+
+</div>
+<p>It’s common that the source images have some exposure differences, which is problematic in creating panoramas. What’s more, the drift problem caused by accumulated errors makes the both ends of the panorama not align well.</p>
+<h3 id="cylindrical-panorama-w-end-to-end-alignment">Cylindrical Panorama w/ End-to-end Alignment</h3>
+<div class="figure">
+<img src="images/CylLoop.jpg" />
+
+</div>
+<p>End-to-end alignment solves the drift problem, which enables the creation of perfect 360-degree full panoramas.</p>
+<h3 id="cylindrical-panorama-w-exposure-correction">Cylindrical Panorama w/ Exposure Correction</h3>
+<div class="figure">
+<img src="images/CylExp.jpg" />
+
+</div>
+<p>Gamma correction can be employed to take care of the exposure differences. The overlapping regions provide enough information to estimate the gamma values.</p>
+<h3 id="cylindrical-panorama-w-alpha-blending">Cylindrical Panorama w/ Alpha Blending</h3>
+<div class="figure">
+<img src="images/CylAlpha.jpg" />
+
+</div>
+<p>Alpha blending introduces transitions across image pieces, and makes the exposure differences less obvious.</p>
+<h3 id="cylindrical-panorama-w-pyramid-blending">Cylindrical Panorama w/ Pyramid Blending</h3>
+<div class="figure">
+<img src="images/CylPyramid.jpg" />
+
+</div>
+<p>Pyramid blending blurs the seams between image pieces.</p>
+<h2 id="image-to-be-vote-bascom-hill-1">Image to be Vote: <em>Bascom Hill</em></h2>
+<p>We took two sets of photos at Bascom Hill on Mar 10, 2015, one of which was used to create a planar panorama and the other was for cylindrical panorama.</p>
+<h3 id="bascom-hill-panorama-planar-1">Bascom Hill Panorama (Planar)</h3>
+<div class="figure">
+<img src="InteractiveViewer/Bascom2.jpg" />
+
+</div>
+<p>View the <a href="InteractiveViewer/Bascom2.html">high-resolution interactive version</a></p>
+<h3 id="bascom-hill-panorama-cylindrical-1">Bascom Hill Panorama (Cylindrical)</h3>
+<div class="figure">
+<img src="InteractiveViewer/Bascom1.jpg" />
+
+</div>
+<p>View the <a href="InteractiveViewer/Bascom1.html">high-resolution interactive version</a></p>
+<h3 id="camera-calibration">Camera Calibration</h3>
+<p>We took the photos with Canon EOS 7D Camera and Canon EF 28-135mm f/3.5-5.6 IS USM Lens. In order to estimate the focal length and the lens distortion parameters, we performed a camera calibration process with <a href="http://www.vision.caltech.edu/bouguetj/calib_doc/">Camera Calibration Toolbox for Matlab</a>.</p>
+<div class="figure">
+<img src="images/Calib.jpg" />
+
+</div>
+<p>We took 38 photos of a checkerboard with various poses to calibrate our camera. In order to be consistent with the lens distortion model we implemented, we simplified the parameter estimation model as well.</p>
+<pre><code>Focal Length:          fc = [ 6624.01573   6624.01573 ] ± [ 21.61046   21.61046 ]
+Principal point:       cc = [ 2591.50000   1727.50000 ] ± [ 0.00000   0.00000 ]
+Skew:             alpha_c = [ 0.00000 ] ± [ 0.00000  ]   =&gt; angle of pixel axes = 90.00000 ± 0.00000 degrees
+Distortion:            kc = [ -0.15801   0.06858   0.00000   0.00000  0.00000 ] ± [ 0.02783   0.32350   0.00000   0.00000  0.00000 ]
+Pixel error:          err = [ 2.43803   1.33927 ]</code></pre>
+<h2 id="another-extension-photo-to-document">Another Extension: <em>Photo to Document</em></h2>
+<p>Another application of homography transformation is to rectify images. We adopted this and developed a method to covert photos that contains pages to clean document images. This is achieved by automatically detecting the corners, rectifying the image and enhancing it.</p>
+<div class="figure">
+<img src="images/Photo2Doc.jpg" />
+
+</div>
+<h1 id="using-the-gui">Using the GUI</h1>
+<p>We implemented an interactive GUI to streamline the process of using our functions to build panoramas. Users can upload images and stitch them using a variety of options. The basic process is:</p>
+<ol style="list-style-type: decimal">
+<li>Open ‘panorama_gui.m’ in MATLAB and Run the file</li>
+<li>Load the images to stitch</li>
+<li>Select the construction method</li>
+<li>Select the blending method</li>
+<li>Select whether to use exposure correction</li>
+<li>Configure options for cylindrical construction (only if using cylindrical)</li>
+</ol>
+<div class="figure">
+<img src="images/gui_screenshot.png" />
+
+</div>
+<h2 id="loading-images">Loading Images</h2>
+<p>Loading the images is simple. Click ‘Load Images’ and select all of the images to stitch.</p>
+<h2 id="selecting-construction-method">Selecting Construction Method</h2>
+<p>We provide 2 methods of stitching images:</p>
+<ul>
+<li>Cylindrical: Projects each image into cylindrical coordinates and solves for translations between images to combine them.</li>
+<li>Homography: Solves for the homographies between images to combine them. This is most appropriate for images that do not wrap around 360 degress.</li>
+</ul>
+<h2 id="selecting-blending-method">Selecting Blending Method</h2>
+<p>This group sets the blending options for the stitching:</p>
+<ul>
+<li>None: No blending will be performed.</li>
+<li>Alpha: This method uses an alpha mask for the image to weight the edges.</li>
+<li>Pyramid: This method uses a pyramid of Laplacians to seamlessly merge the images.</li>
+</ul>
+<h2 id="exposure-correction">Exposure Correction</h2>
+<p>If ‘On’ is selected, the images will be corrected to have the same exposure value using gamma correction. Selecting ‘Off’ will perform no exposure changes to the image.</p>
+<h2 id="cylindrical-construction-options">Cylindrical Construction Options</h2>
+<p>These options are only used if using the cylindrical construction method. <strong>All fields are required!</strong></p>
+<ul>
+<li>Full Loop: Check this box if the images form a 360 degree loop.</li>
+<li>focal len: The focal length of the camera for this image scale in pixels.</li>
+<li>k1, k2: Radial distortion parameters for the camera lens.</li>
+</ul>
+<h2 id="stitching">Stitching</h2>
+<p>After all options are set, click ‘Stitch Images’. This button is not enabled until images are loaded.</p>
+<h2 id="saving-enlarging-images">Saving &amp; Enlarging Images</h2>
+<p>All photos in the program can be clicked to enlarge and saved via the enlarged image window’s file menu.</p>
+<h1 id="function-descriptions">Function Descriptions</h1>
+<p>Below provide basic descriptions of our functions.</p>
+<h2 id="panorama_gui.m">panorama_gui.m</h2>
+<p><code>function varargout = panorama_gui(varargin)</code> This is the main program file to launch the GUI. Please run this file in MATLAB to use our program.</p>
+<h2 id="loadimages.m">loadImages.m</h2>
+<p><code>function imgs = loadImages(imgFiles)</code> Simple function to load a list of images</p>
+<p>Inputs:</p>
+<ul>
+<li>imgFiles: a vector of image filenames to load (1D cell array)</li>
+</ul>
+<p>Outputs:</p>
+<ul>
+<li>imgs: the loaded color images (4D array, height x width x color x imageIndex)</li>
+</ul>
+<h2 id="comperror.m">compError.m</h2>
+<p><code>function [SSR] = compError(datapoint, transform)</code> Function to compute sum of squared errors</p>
+<p>Input:</p>
+<ul>
+<li>datapoint - 1 x n x 2 matrix containing the points to compare (1 x n vectors)</li>
+<li>transform - the nxn transform to apply to pprime</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>SSR - calculation of sum of squared errors</li>
+</ul>
+<h2 id="createpanoramacyl.m">createPanoramaCyl.m</h2>
+<p><code>function [ newImg ] = createPanoramaCyl( imgs, f, k1, k2, loop, matchExp, blend )</code> Create panorama image using cylindrical projection</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>f - local length</li>
+<li>k1, k2 - radial distortion parameters</li>
+<li>loop - is is a full panorama?</li>
+<li>matchExp - match exposures across images?</li>
+<li>blend - use which blending technique? ‘Alpha’ or ‘Pyramid’</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>newImg - panorama image</li>
+</ul>
+<h2 id="createpanoramapla.m">createPanoramaPla.m</h2>
+<p><code>function [ newImg ] = createPanoramaPla( imgs, matchExp, blend )</code> Create panorama image using homography</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>matchExp - match exposures across images?</li>
+<li>blend - use which blending technique? ‘Alpha’ or ‘Pyramid’</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>newImg - panorama image</li>
+</ul>
+<h2 id="cylproj.m">cylProj.m</h2>
+<p><code>function [ cylImg ] = cylProj( img, f, k1, k2 )</code> Warp image into cylindrical coordinates and correct radial distortion</p>
+<p>Input:</p>
+<ul>
+<li>img - source image</li>
+<li>f - focal length</li>
+<li>k1, k2 - radial distortion parameters</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>cylImg - cylindrical warpped images</li>
+</ul>
+<h2 id="estimatehomographies.m">estimateHomographies.m</h2>
+<p><code>function [ homographies ] = estimateHomographies( imgs )</code> Estimate pairwise homographies</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>homographies - homographies matrices to align each pair of images</li>
+</ul>
+<h2 id="solvetranslation.m">solveTranslation.m</h2>
+<p><code>function [ T ] = solveTranslation( cp1, cp2 )</code> Compute translation matrix</p>
+<p>Input:</p>
+<ul>
+<li>cp1 - correspondence points in image1, n x 2 matrix</li>
+<li>cp2 - correspondence points in image2, n x 2 matrix</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>H - translation matrix that transforms points in image2 to points in image1, 3 x 3 matrix if overdetermined, solve in the least-sqaure sense</li>
+</ul>
+<h2 id="solvehomography.m">solveHomography.m</h2>
+<p><code>function [ H ] = solveHomography( cp1, cp2 )</code> Compute homography matrix</p>
+<p>Input:</p>
+<ul>
+<li>cp1 - correspondence points in image1, n x 2 matrix</li>
+<li>cp2 - correspondence points in image2, n x 2 matrix</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>H - homography matrix that transforms points in image2 to points in image1, 3 x 3 matrix if overdetermined, solve in the least-sqaure sense</li>
+</ul>
+<h2 id="ransac.m">RANSAC.m</h2>
+<p><code>function [bestSetting] = RANSAC(P, p, n, data, epsilon, settingFunctionHandle, SSDFunctionHandle)</code> RANSAC function for feature matching. Computes the best setting of parameters.</p>
+<p>Input:</p>
+<ul>
+<li>P - probability of having at least 1 success (0.99 is a good setting)</li>
+<li>p - probability of a real inlier (can be pesimistic, try 0.5)</li>
+<li>n - number of samples each run</li>
+<li>data - the data points of interest</li>
+<li>epsilon - threshold for inlier</li>
+<li>settingFunctionHandle - handle to function to compute parameter values (homography, translation, etc.)</li>
+<li>SSDFunctionHanle - handle to function to compute the error measure</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>H - homography matrix that transforms points in image2 to points in image1, 3 x 3 matrix</li>
+</ul>
+<h2 id="photo2doc.m">photo2Doc.m</h2>
+<p><code>function [ newImg ] = photo2Doc( img )</code> Align an image as a document (uses homography to transform it into a rectangle)</p>
+<p>Input:</p>
+<ul>
+<li>img - source image to align</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>newImg - the image aligned as a document</li>
+</ul>
+<h2 id="mergepyramid.m">mergePyramid.m</h2>
+<p><code>function [ finalImg ] = mergePyramid( imgs, transforms, newHeight )</code> Merge images using Pyramid blending</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>transforms - transformation matrices to transform each images into the new coordinate system</li>
+<li>newHeight - height of the new coordinate system</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>finalImg - merged image</li>
+</ul>
+<h2 id="mergenoblend.m">mergeNoBlend.m</h2>
+<p><code>function [ newImg ] = mergeNoBlend( imgs, mask, transforms, newHeight, newWidth )</code> Merge images with no blending</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>mask - image mask</li>
+<li>transforms - transformation matrices to transform each images into the new coordinate system</li>
+<li>newHeight, newWidth - size of the new coordinate system</li>
+</ul>
+<p>Output:</p>
+<p>*newImg - merged image</p>
+<h2 id="mergealpha.m">mergeAlpha.m</h2>
+<p><code>function [ newImg ] = mergeAlpha( imgs, mask, transforms, newHeight, newWidth )</code> Merge images using Alpha blending</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>mask - image mask</li>
+<li>transforms - transformation matrices to transform each images into the new coordinate system</li>
+<li>newHeight, newWidth - size of the new coordinate system</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>newImg - merged image</li>
+</ul>
+<h2 id="matchexposures.m">matchExposures.m</h2>
+<p><code>function [ newImgs ] = matchExposures( imgs, transforms, loop )</code> Match exposures across images</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+<li>transforms - pairwise transformation matrices</li>
+<li>loop - is is a full panorama?</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>newImgs - exposure matched images</li>
+</ul>
+<h2 id="getsiftfeatures.m">getSIFTFeatures.m</h2>
+<p><code>function [f, d] = getSIFTFeatures(image, edgeThresh)</code> Function returns feature locations and SIFT descriptors for an image. Uses the VLFeat library.</p>
+<p>Input:</p>
+<ul>
+<li>image - an rgb or greyscale image matrix</li>
+<li>edgeThresh - non-edge selection threshold (default should be 10)</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>potential_matches - 3 x n x 2 matrix of [x y z=1] positions for n potential feature matches in images 1 and 2</li>
+<li>scores - the score for each of the n matches in a vector</li>
+</ul>
+<h2 id="getpotentialmatches.m">getPotentialMatches.m</h2>
+<p><code>function [potential_matches, scores] = getPotentialMatches(f1, d1, f2, d2)</code> Function to return potential feature matches between two images. Uses the VLFeat library.</p>
+<p>Input:</p>
+<ul>
+<li>f1, f2 - vector of SIFT feature locations and scales for images 1 and 2</li>
+<li>d1, d2 - vector of SIFT feature descriptors that correspond</li>
+<li>with f1, f2</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>potential_matches - 3 x n x 2 matrix of [x y z=1] positions for n potential feature matches in images 1 and 2</li>
+<li>scores - the score for each of the n matches in a vector</li>
+</ul>
+<h2 id="estimatetranslations.m">estimateTranslations.m</h2>
+<p><code>function [ translations ] = estimateTranslations( imgs )</code> Estimate pairwise translations</p>
+<p>Input:</p>
+<ul>
+<li>imgs - source images</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>translations - translation matrices to align each pair of images</li>
+</ul>
+<h1 id="other-files">Other Files</h1>
+<p>Some other files that are not meant to be used functionally, but are either needed for the GUI or were used for testing.</p>
+<h2 id="enlargeimage.m"><em>enlargeImage.m</em></h2>
+<p>This is a callback that is attached to images in the GUI to enlarge them when clicked.</p>
+<h2 id="panorama_gui.fig"><em>panorama_gui.fig</em></h2>
+<p>This is the GUI window template.</p>
+<h2 id="testscriptscreatepanoramacyl_test.m"><em>TestScripts\createPanoramaCyl_test.m</em></h2>
+<p>A test script to evaluate functions to create panoramas using the cylindrical projection method.</p>
+<h2 id="testscriptscreatepanoramapla_test.m"><em>TestScripts\createPanoramaPla_test.m</em></h2>
+<p>A test script to evaluate functions to create panoramas using the homography method.</p>
+<h2 id="testscriptscylproj_test.m"><em>TestScripts\cylProj_test.m</em></h2>
+<p>A test script to evaluate the cylindrical projection method.</p>
+<h2 id="testscriptsphoto2doc_test.m"><em>TestScripts\photo2Doc_test.m</em></h2>
+<p>A test script to evaluate functions for aligning an image as a document</p>
+<h2 id="testscriptsransac_test.m"><em>TestScripts\RANSAC_test.m</em></h2>
+<p>A test script to evaluate our RANSAC method.</p>
+<h1 id="credits">Credits</h1>
+<p>Below is a break-down of the work description. We worked together on taking the images, editing the project wiki and also helped fix some of each other’s bugs!</p>
+<h2 id="ke-ma">Ke Ma</h2>
+<ul>
+<li>Homography and translation solver</li>
+<li>Cylindrical warping with lens distortion correction</li>
+<li>Panorama creation pipeline</li>
+<li>Exposure correction</li>
+<li>Alpha blending</li>
+<li>Interactive panorama viewer (<a href="https://github.com/peachananr/panorama_viewer/">Panorama Viewer</a>)</li>
+<li>“Photo to Document”</li>
+</ul>
+<h2 id="christopher-bodden">Christopher Bodden</h2>
+<ul>
+<li>SIFT feature description and matching (<a href="http://www.vlfeat.org/">VLFeat</a>)</li>
+<li>RANSAC</li>
+<li>Pyramid blending</li>
+<li>Graph cut blending <em>(not completed due to min cut issues)</em></li>
+<li>Transform and crop for image pairs</li>
+<li>GUI</li>
+</ul>
+<h1 id="references">References</h1>
+<ol style="list-style-type: decimal">
+<li>Lowe, D. G. (1999). Object recognition from local scale-invariant features. In Computer vision.</li>
+<li>Fischler, M. A., &amp; Bolles, R. C. (1981). Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography.</li>
+<li>Szeliski, R., &amp; Shum, H. Y. (1997). Creating full view panoramic image mosaics and environment maps.</li>
+<li>Brown, M., &amp; Lowe, D. G. (2003). Recognising panoramas.</li>
+<li>Zhang, Z. (2000). A flexible new technique for camera calibration.</li>
+<li>Burt, P. J., &amp; Adelson, E. H. (1983). A multiresolution spline with application to image mosaics.</li>
+<li>Kwatra, V., Schodl, A., Essa, I., Turk, G., &amp; Bobick, A. (2003). Graphcut Textures: Image and Video Synthesis Using Graph Cuts.</li>
+</ol>
+<hr />
+<p>&copy;2015 Ke Ma, Christopher Bodden</p>
+</body>
+</html>
