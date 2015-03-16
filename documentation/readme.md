@@ -5,8 +5,8 @@
 # Project Overview
 
 ## Links
-* Repository: <https://github.com/cbod/cs766-panarama>
-* Wiki: <https://github.com/cbod/cs766-panarama/wiki>
+* Repository: <https://github.com/cbod/cs766-panorama>
+* Wiki: <https://github.com/cbod/cs766-panorama/wiki>
 
 ## Assignment Description
 
