@@ -1,12 +1,12 @@
-# cs766-panorama Project
+# CS 766 Panorama Project
 
-## Group Members:
+## Group Members
 Ke Ma, Christopher Bodden
 
-## Assignment Description:
+## Assignment Description
 Image stitching is a technique to combine a set of images into a larger image by registering, warping, resampling and blending them together. A popular application of image stitching is to create panoramas. Generally speaking, there are two classes of methods for image stitching: direct methods and feature-based methods. In this project we implement a feature-based method using SIFT features.
 
-## Features:
+## Features
 This is a brief description of our implementation. More details can be found in the other pages of the wiki.
 
 ### Basic Features
@@ -29,20 +29,20 @@ This is a brief description of our implementation. More details can be found in 
 
 * Graph Cut Blending - There were issues with the minimum cut algorithm as well as concerns about practicality (the runtime was extremely long to cut the graph even for small images).
 
-## Program Screenshot:
+## Program Screenshot
 
-![](TestImages/gui_screenshot.png)
+![](TestImages/gui.jpg)
 
-## Image to be Vote:
+## Image to be Vote
 
 ### Bascom Hill Panorama (Planar)
 
-![](InteractiveViewer/Bascom2.jpg)
+![](TestImages/BascomTest2.jpg)
 
-View the [high-resolution interactive version] (InteractiveViewer/Bascom2.html)
+View the [high-resolution interactive version](InteractiveViewer/Bascom2.html)
 
 ### Bascom Hill Panorama (Cylindrical)
 
-![](InteractiveViewer/Bascom1.jpg)
+![](TestImages/BascomTest1.jpg)
 
 View the [high-resolution interactive version](InteractiveViewer/Bascom1.html)
