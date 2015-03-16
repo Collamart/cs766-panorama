@@ -38,7 +38,7 @@ This is a brief description of our implementation. More details can be found in 
 
 ## Program Screenshot
 
-![](images/gui_screenshot.png)
+![](images/Gui.jpg)
 
 ## Image to be Vote: *Bascom Hill*
 
@@ -171,7 +171,7 @@ We implemented an interactive GUI to streamline the process of using our functio
 5. Select whether to use exposure correction
 6. Configure options for cylindrical construction (only if using cylindrical)
 
-![](images/gui_screenshot.png)
+![](images/Gui.jpg)
 
 ## Loading Images
 Loading the images is simple. Click 'Load Images' and select all of the images to stitch.
