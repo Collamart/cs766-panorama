@@ -39,10 +39,10 @@ This is a brief description of our implementation. More details can be found in 
 
 ![](TestImages/BascomTest2.jpg)
 
-View the [high-resolution interactive version](InteractiveViewer/Bascom2.html)
+View the [high-resolution interactive version](http://pages.cs.wisc.edu/~kma/panorama/Bascom2.html)
 
 ### Bascom Hill Panorama (Cylindrical)
 
 ![](TestImages/BascomTest1.jpg)
 
-View the [high-resolution interactive version](InteractiveViewer/Bascom1.html)
+View the [high-resolution interactive version](http://pages.cs.wisc.edu/~kma/panorama/Bascom1.html)
